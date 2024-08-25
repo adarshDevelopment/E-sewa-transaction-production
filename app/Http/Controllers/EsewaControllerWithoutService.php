@@ -6,7 +6,6 @@ namespace App\Http\Controllers;
 // use Config;
 
 use App\Models\Order;
-use App\Services\EsewaService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use RemoteMerge\Esewa\Client;
@@ -20,14 +19,19 @@ use RemoteMerge\Esewa\Config;
 
 */
 
-class EsewaController extends Controller
+class EsewaControllerWithoutService extends Controller
 {
 
-    protected $esewaService;
+    protected $esewa;
 
-    public function __construct(EsewaService $esewaService)
+    public function __construct()
     {
-        $this->esewaService = $esewaService;
+        $successUrl = url('/success');
+        $failureUrl = url('/failure');
+
+        // config for development
+        $config = new Config($successUrl, $failureUrl);
+        $this->esewa = new Client($config);
     }
 
     public function esewaPay(Request $request)
@@ -51,25 +55,14 @@ class EsewaController extends Controller
         ]);
 
 
-        $successUrl = url('/success');
-        $failureUrl = url('/failure');
 
-        // config for development
-        $config = new Config($successUrl, $failureUrl);
-
-        // config for production
-        // $config = new Config($successUrl, $failureUrl, 'b4e...e8c753..2c6e8b', 'production');
-
-        // initialize esewa Client
-        $this->esewaService->initialize($config);
         // dd($this->esewa);
         // now redirect user to esewa dashboard
         // once the payment is successful, it will redirect to your success URL or failure URL
 
 
         // make payment
-        // $this->esewa->process($pid, $request->amount, 0, 0, 0);
-        $this->esewaService->process($pid, $request->amount, 0);
+        $this->esewa->process($pid, $request->amount, 0, 0, 0);
     }
 
     // invoke when success
@@ -80,9 +73,9 @@ class EsewaController extends Controller
         // dd($pid);
         $amt = $_GET['amt'];
         $refId = $_GET['refId'];
-
-        $status = $this->esewaService->verify($refId, $pid, $amt);
-
+        // dd($this->esewa);
+        $status = $this->esewa->verify($refId, $pid, $amt);
+        // dd($status);
         // if unverified back to failure page
         if (!$status) {
             $msg  = 'Failure';
