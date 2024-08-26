@@ -10,10 +10,10 @@ class EsewaService
 
     protected $esewa;
 
-    // public function __construct($config)
-    // {
-    //     $this->esewa = new Client($config);
-    // }
+    public function __construct($config)
+    {
+        $this->esewa = new Client($config);
+    }
 
     public function initialize($config)
     {

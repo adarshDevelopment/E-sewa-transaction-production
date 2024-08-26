@@ -25,9 +25,13 @@ class EsewaController extends Controller
 
     protected $esewaService;
 
-    public function __construct(EsewaService $esewaService)
+    public function __construct()
     {
-        $this->esewaService = $esewaService;
+
+        $successUrl = url('/success');
+        $failureUrl = url('/failure');
+
+        $this->esewaService = new EsewaService(new Config($successUrl, $failureUrl));
     }
 
     public function esewaPay(Request $request)
@@ -51,17 +55,17 @@ class EsewaController extends Controller
         ]);
 
 
-        $successUrl = url('/success');
-        $failureUrl = url('/failure');
+        // $successUrl = url('/success');
+        // $failureUrl = url('/failure');
 
         // config for development
-        $config = new Config($successUrl, $failureUrl);
+        // $config = new Config($successUrl, $failureUrl);
 
         // config for production
         // $config = new Config($successUrl, $failureUrl, 'b4e...e8c753..2c6e8b', 'production');
 
         // initialize esewa Client
-        $this->esewaService->initialize($config);
+        // $this->esewaService->initialize($config);
         // dd($this->esewa);
         // now redirect user to esewa dashboard
         // once the payment is successful, it will redirect to your success URL or failure URL
